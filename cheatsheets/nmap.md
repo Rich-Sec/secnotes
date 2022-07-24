@@ -1,8 +1,5 @@
 # NMAP CheatSheet
 
-
-### NMAP Scans:
-
 | Scan Type               | Command                                        |
 | ----------------------- | :---------------------------------------------:|
 | ARP Scan                | sudo nmap -PR -sn <IP>/24                      |
@@ -27,24 +24,24 @@
 | Decoy Scan              | nmap -D DECOY_IP,ME <IP>                       |
 | Idle (Zombie) Scan      | sudo nmap -sI ZOMBIE_IP <IP>                   |  
 
-## Nmap Flags:
-Flag                                    Purpose
---------------------------------------- :---------------------------------------:
--f                                      Fragment IP data into 8 bytes  
--ff                                     Fragment IP data into 16 bytes 
--p-                                     All Ports
--p1-1023                                Scan Ports 1 to 1023
--F                                      100 Most Common Ports
--r                                      Scan Ports in Consecutive Order
--T<0-5>                                 -T0 being the Slowest and T5 the Fastest
---max-rate 50                           Rate <= 50 packets/sec
---min-rate 15                           Rate >= 15 packets/sec
---min-parallelism 100                   At least 100 Probes in Parallel
---source-port PORT_NUM                  Specify source port number
---data-length NUM                       Append random data to reach given length
---traceroute                            Run traceroute to target 
---reason                                explains how Nmap made its conclusion
--v                                      verbose
--vv                                     very verbose
--d                                      debugging
--dd                                     more details for debugging
+
+| Flag                                    | Purpose                                  |
+| --------------------------------------- | :---------------------------------------:|
+|-f                                       |  Fragment IP data into 8 bytes           |
+|-ff                                      |  Fragment IP data into 16 bytes          |
+|-p-                                      |  All Ports                               | 
+|-p1-1023                                 |  Scan Ports 1 to 1023                    |
+|-F                                       | 100 Most Common Ports                    |
+|-r                                       | Scan Ports in Consecutive Order          |
+|-T<0-5>                                  | -T0 being the Slowest and T5 the Fastest |
+|--max-rate 50                            | Rate <= 50 packets/sec                   |
+|--min-rate 15                            | Rate >= 15 packets/sec                   |
+|--min-parallelism 100                    | At least 100 Probes in Parallel          | 
+|--source-port PORT_NUM                   | Specify source port number               |
+|--data-length NUM                        | Append random data to reach given length |
+|--traceroute                             | Run traceroute to target                 |
+|--reason                                 | explains how Nmap made its conclusion    |  
+|-v                                       | verbose                                  |
+|-vv                                      | very verbose                             |
+|-d                                       | debugging                                |
+|-dd                                      | more details for debugging               |
