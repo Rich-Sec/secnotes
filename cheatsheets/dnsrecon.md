@@ -1,7 +1,7 @@
 # DNS Recon CheatSheet
 
-| Purpose                 |            Command                                        |
-| ----------------------- |            :---------------------------------------------:|
+| Purpose                              | Command                                         |
+| -------------------------------------| :---------------------------------------------: |
    Lookup WHOIS record                     whois <IP>
    Lookup DNS A records                    nslookup -type=A <IP>
    Lookup DNS MX records at DNS server     nslookup -type=MX <IP> 1.1.1.1
