@@ -1,2 +1,2 @@
 # Welcome index.md!
-[CheatSheets](cheetsheets)
+[CheatSheets](cheatsheets)
