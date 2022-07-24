@@ -1,2 +1,2 @@
 # Welcome index.md!
-[CheatSheets](cheatsheets)
+[Home](index.md) | [CheatSheets](cheatsheets.md) | [About](about.md)
