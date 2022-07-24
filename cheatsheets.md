@@ -1,5 +1,5 @@
 # CheatSheets
-[Home](index.md) | [About](about.md)
+[Home](index.md) | [CheatSheets](cheatsheets.md) | [About](about.md)
 
 * [NMAP](cheatsheets/nmap.md)
 * [DNS Recon](cheatsheets/dnsrecon.md)
