@@ -1,5 +1,5 @@
 # NMAP CheatSheet
-[Home](index.md) | [About](about.md) [CheatSheets](cheatsheets.md)
+[Home](../index.md) | [About](../about.md) | [CheatSheets](../cheatsheets.md)
 
 | Scan Type               | Command                                        |
 | ----------------------- | :---------------------------------------------:|
