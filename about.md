@@ -2,7 +2,7 @@
 
 [Home](index.md) | [CheatSheets](cheatsheets.md) | [About](about.md)
 
-## *whoami*:
+## *whoami*
 
 * Richard Smith
 * Junior Penetration Tester
