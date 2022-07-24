@@ -2,28 +2,35 @@
 
 ## NMAP Scans:
 
-ARP Scan                                sudo nmap -PR -sn MACHINE_IP/24
-ICMP Echo Scan                          sudo nmap -PE -sn MACHINE_IP/24
-ICMP Timestamp Scan                     sudo nmap -PP -sn MACHINE_IP/24
-ICMP Address Mask Scan                  sudo nmap -PM -sn MACHINE_IP/24
-TCP SYN Ping Scan                       sudo nmap -PS22,80,443 -sn MACHINE_IP/30
-TCP ACK Ping Scan                       sudo nmap -PA22,80,443 -sn MACHINE_IP/30
-UDP Ping Scan                           sudo nmap -PU53,161,162 -sn MACHINE_IP/30
-TCP Connect Scan                        nmap -sT 10.10.116.122
-TCP SYN Scan                            sudo nmap -sS 10.10.116.122
-UDP Scan                                sudo nmap -sU 10.10.116.122
-TCP Null Scan                           sudo nmap -sN 10.10.242.141
-TCP FIN Scan                            sudo nmap -sF 10.10.242.141
-TCP Xmas Scan                           sudo nmap -sX 10.10.242.141
-TCP Maimon Scan                         sudo nmap -sM 10.10.242.141
-TCP ACK Scan                            sudo nmap -sA 10.10.242.141
-TCP Window Scan                         sudo nmap -sW 10.10.242.141
-Custom TCP Scan                         sudo nmap --scanflags URGACKPSHRSTSYNFIN 10.10.242.141
-Spoofed Source IP                       sudo nmap -S SPOOFED_IP 10.10.242.141
-Spoofed MAC Address                     --spoof-mac SPOOFED_MAC
-Decoy Scan                              nmap -D DECOY_IP,ME 10.10.242.141
-Idle (Zombie) Scan                      sudo nmap -sI ZOMBIE_IP 10.10.242.141
-Run traceroute to target                --traceroute
+| Scan Type     | Command       |    
+| ------------- |:-------------:|
+| ARP Scan      | right-aligned |
+| col 2 is      | centered      |
+| zebra stripes | are neat      |
+
+| Scan Type               | Command                                        |
+| ----------------------- | :---------------------------------------------:|
+| ARP Scan                | sudo nmap -PR -sn <IP>/24                      |
+| ICMP Echo Scan          | sudo nmap -PE -sn <IP>/24                      |
+| ICMP Timestamp Scan     | sudo nmap -PP -sn <IP>/24                      |
+| ICMP Address Mask Scan  | sudo nmap -PM -sn <IP>/24                      |
+| TCP SYN Ping Scan       | sudo nmap -PS22,80,443 -sn <IP>/30             |
+| TCP ACK Ping Scan       | sudo nmap -PA22,80,443 -sn <IP>/30             |
+| UDP Ping Scan           | sudo nmap -PU53,161,162 -sn <IP>/30            | 
+| TCP Connect Scan        | nmap -sT <IP>                                  |
+| TCP SYN Scan            | sudo nmap -sS <IP>                             |
+| UDP Scan                | sudo nmap -sU <IP>                             |
+| TCP Null Scan           | sudo nmap -sN <IP>
+| TCP FIN Scan            | sudo nmap -sF <IP>
+| TCP Xmas Scan           | sudo nmap -sX <IP>
+| TCP Maimon Scan         | sudo nmap -sM <IP>
+| TCP ACK Scan            | sudo nmap -sA <IP>
+| TCP Window Scan         | sudo nmap -sW <IP>
+| Custom TCP Scan         | sudo nmap --scanflags URGACKPSHRSTSYNFIN <IP> |
+| Spoofed Source IP       | sudo nmap -S SPOOFED_IP <IP>
+| Spoofed MAC Address     | --spoof-mac SPOOFED_MAC
+| Decoy Scan              | nmap -D DECOY_IP,ME <IP>
+| Idle (Zombie) Scan      | sudo nmap -sI ZOMBIE_IP <IP>
 
 ## Nmap Flags:
 -f                                      Fragment IP data into 8 bytes  
@@ -36,8 +43,9 @@ Run traceroute to target                --traceroute
 --max-rate 50                           Rate <= 50 packets/sec
 --min-rate 15                           Rate >= 15 packets/sec
 --min-parallelism 100                   At least 100 Probes in Parallel
---source-port PORT_NUM                  specify source port number
---data-length NUM                       append random data to reach given length
+--source-port PORT_NUM                  Specify source port number
+--data-length NUM                       Append random data to reach given length
+--traceroute                            Run traceroute to target 
 --reason                                explains how Nmap made its conclusion
 -v                                      verbose
 -vv                                     very verbose
