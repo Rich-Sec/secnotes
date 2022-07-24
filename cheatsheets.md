@@ -1,4 +1,3 @@
-<h1>CheatSheets</h1>
-
-# Cheatsheets below:
+# CheatSheets
 [homepage](index.md)
+
