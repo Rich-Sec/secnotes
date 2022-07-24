@@ -1,12 +1,7 @@
 # NMAP CheatSheet
 
-## NMAP Scans:
 
-| Scan Type     | Command       |    
-| ------------- |:-------------:|
-| ARP Scan      | right-aligned |
-| col 2 is      | centered      |
-| zebra stripes | are neat      |
+### NMAP Scans:
 
 | Scan Type               | Command                                        |
 | ----------------------- | :---------------------------------------------:|
@@ -20,19 +15,21 @@
 | TCP Connect Scan        | nmap -sT <IP>                                  |
 | TCP SYN Scan            | sudo nmap -sS <IP>                             |
 | UDP Scan                | sudo nmap -sU <IP>                             |
-| TCP Null Scan           | sudo nmap -sN <IP>
-| TCP FIN Scan            | sudo nmap -sF <IP>
-| TCP Xmas Scan           | sudo nmap -sX <IP>
-| TCP Maimon Scan         | sudo nmap -sM <IP>
-| TCP ACK Scan            | sudo nmap -sA <IP>
-| TCP Window Scan         | sudo nmap -sW <IP>
-| Custom TCP Scan         | sudo nmap --scanflags URGACKPSHRSTSYNFIN <IP> |
-| Spoofed Source IP       | sudo nmap -S SPOOFED_IP <IP>
-| Spoofed MAC Address     | --spoof-mac SPOOFED_MAC
-| Decoy Scan              | nmap -D DECOY_IP,ME <IP>
-| Idle (Zombie) Scan      | sudo nmap -sI ZOMBIE_IP <IP>
+| TCP Null Scan           | sudo nmap -sN <IP>                             |
+| TCP FIN Scan            | sudo nmap -sF <IP>                             |
+| TCP Xmas Scan           | sudo nmap -sX <IP>                             |
+| TCP Maimon Scan         | sudo nmap -sM <IP>                             |
+| TCP ACK Scan            | sudo nmap -sA <IP>                             |
+| TCP Window Scan         | sudo nmap -sW <IP>                             |
+| Custom TCP Scan         | sudo nmap --scanflags URGACKPSHRSTSYNFIN <IP>  |
+| Spoofed Source IP       | sudo nmap -S SPOOFED_IP <IP>                   |
+| Spoofed MAC Address     | --spoof-mac SPOOFED_MAC                        |
+| Decoy Scan              | nmap -D DECOY_IP,ME <IP>                       |
+| Idle (Zombie) Scan      | sudo nmap -sI ZOMBIE_IP <IP>                   |  
 
 ## Nmap Flags:
+Flag                                    Purpose
+--------------------------------------- :---------------------------------------:
 -f                                      Fragment IP data into 8 bytes  
 -ff                                     Fragment IP data into 16 bytes 
 -p-                                     All Ports
