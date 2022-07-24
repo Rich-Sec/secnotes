@@ -1,2 +1,2 @@
 # secnotes
-A github pages project
+https://rich-sec.github.io/secnotes/
