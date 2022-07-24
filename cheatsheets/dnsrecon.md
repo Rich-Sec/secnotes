@@ -1,5 +1,5 @@
 # DNS Recon CheatSheet
-
+[Home](../index.md) | [CheatSheets](../cheatsheets.md) | [About](../about.md)
 | Purpose                              | Command                                         |
 | -------------------------------------| :---------------------------------------------: |
    Lookup WHOIS record                 |    whois :IP:                                   |             
