@@ -2,7 +2,7 @@
 [Home](../index.md) | [CheatSheets](../cheatsheets.md) | [About](../about.md)
 
 | Symbol / Syntax                | Function                                           | 
-|                                |                                                    |
+| ------------------------------ | :------------------------------------------------: |
 | "search phrase"                | Find results with exact search phrase              |
 | OSINT filetype:pdf             | Find files of type PDF related to a certain term.  |
 | salary site:blog.tryhackme.com | Limit search results to a specific site.           | 
