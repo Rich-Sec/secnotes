@@ -16,3 +16,5 @@
 | cp /bin/bash .                                                                                    	| Copy the /bin/bash binary to your current directory, this only works if / is allowed.                                                    	|
 | zip /tmp/test.zip /tmp/test -T --unzip-command="sh -c /bin/bash"                                  	| Use the zip command to spawn a bash shell, create a zip file first using touch.                                                          	|
 | tar cf /dev/null testfile --checkpoint=1 --checkpoint-action=exec=/bin/bash                       	| Use the tar command to execute the bash binary upon archive creation.                                                                    	|
+
+
