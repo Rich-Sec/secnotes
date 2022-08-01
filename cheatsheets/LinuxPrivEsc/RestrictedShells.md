@@ -1,5 +1,5 @@
 # Linux PrivEsc CheatSheet
-[Home](../index.md) | [CheatSheets](../cheatsheets.md) | [About](../about.md)
+[Home](../index.md) | [CheatSheets](../../cheatsheets.md) | [About](../about.md)
 
 ## Restricted Bash Shell Breakout:
                                                                 	|
