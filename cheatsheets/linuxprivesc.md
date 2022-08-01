@@ -2,6 +2,7 @@
 [Home](../index.md) | [CheatSheets](../cheatsheets.md) | [About](../about.md)
 
 * [RBash Breakout](LinuxPrivEsc/RestrictedShells.md)
+
 | Command 	| Notes 	|
 |---	|---	|
 | $SHELL 	| Determine if we are in an rbash shell (/bin/rbash) 	|
