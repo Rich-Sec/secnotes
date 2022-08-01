@@ -2,9 +2,9 @@
 [Home](../../index.md) | [CheatSheets](../../cheatsheets.md) | [About](../../about.md)
 
 ## Restricted Bash Shell Breakout:
-                                                                	|
-| Command                                                                                           	| Notes                                                                                                                                    	|
-|---------------------------------------------------------------------------------------------------	|------------------------------------------------------------------------------------------------------------------------------------------	|
+                                                                	
+| Command                                                                                           	| Notes                                                                                                                                    	                |
+|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------	|
 | $SHELL                                                                                            	| Determine if we are in an rbash shell (/bin/rbash)                                                                                       	|
 | ssh user@ip -t "bash --noprofile"                                                                 	| Bypass rbash if we can use SSH along with a known username and password                                                                  	|
 | vi<br>:set shell=/bin/bash<br>:shell                                                              	| Use vi or vim to breakout of rbash and use /bin/bash, alternatively could use any other shell. E.g zsh<br>                               	|
