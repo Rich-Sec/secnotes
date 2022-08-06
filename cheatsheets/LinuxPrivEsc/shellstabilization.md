@@ -1,5 +1,5 @@
 # Linux PrivEsc CheatSheet
-[Home](../../index.md) | [CheatSheets](../../cheatsheets.md) | [About](../../about.md) | [Back](../linuxprivesc.md)
+[Home](index.md) | [CheatSheets](cheatsheets.md) | [Theory](theory.md) | [About](about.md) | [Back](../linuxprivesc.md)
 
 ## Shell Stabilization:
 
