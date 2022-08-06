@@ -1,5 +1,5 @@
 # Google Dorking CheatSheet
-[Home](../index.md) | [CheatSheets](../cheatsheets.md) | [About](../about.md)
+[Home](index.md) | [CheatSheets](cheatsheets.md) | [Theory](theory.md) | [About](about.md)
 
 | Symbol / Syntax                | Function                                           | 
 | ------------------------------ | :------------------------------------------------: |
