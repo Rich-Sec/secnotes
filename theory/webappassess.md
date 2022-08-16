@@ -1,5 +1,5 @@
 # Web Application Attacks
-[Home](index.md) | [CheatSheets](cheatsheets.md) | [Theory](theory.md) | [About](about.md) | [Back](../theory.md)
+[Home](../index.md) | [CheatSheets](../cheatsheets.md) | [Theory](../theory.md) | [About](../about.md) | [Back](../theory.md)
 
 ## What is a Web Application? 
 
