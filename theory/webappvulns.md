@@ -37,5 +37,23 @@ When a server issues a JWT token a signature is typically generated from the hea
   If the server uses the username name/value pair to identify which user account to display and signature verification is flawed, an attacker could change the value to any user they wish and take over their account. Similarly, if the value of the userType name/value pair was changed to "admin", an attacker might be able to access administration functionality.
   
   ### Accepting Arbitrary Signatures:
-  JWT code libraries typically provide two methods for handling tokens, one method will verify the token and the other will simply decode the token. The Node.js jsonwebtoken library provides the methods verify() for verifying the tokens signature and decode() for decoding the JWT, it could be the case that in the implementation of the JWT functionality, the developer(s) passed the token only to the decode() method and not to the verify() method beforehand. This means that the application does not perform any signature validation at all before returning application data to the user. 
+  JWT code libraries typically provide two methods for handling tokens, one method will verify the token and the other will simply decode the token. The Node.js jsonwebtoken library provides the methods verify() for verifying the tokens signature and decode() for decoding the JWT, it could be the case that in the implementation of the JWT functionality, the developer(s) passed the token only to the decode() method and not to the verify() method beforehand. This means that the application does not perform any signature validation at all before returning application data to the user.
+  
+  If the server fails to validate the signature in this way, we could try changing the values in the payload section to other users or administrative usernames in an attempt to access restricted parts of the application. To do this, modify the payload values in a JWT editor such as the one provided in burpsuite and replace your token with the one you modified. If the server does not perform any signature validation you might be able to access restricted parts of the application such as user other user accounts, administration portals, etc. Remember, if the server does not perform any signature validation you won't need to change the signature of the JWT in anyway just the payload values. 
+  
+  ### Removing the Signature:
+  The JWT header contains a parameter called 'alg' which informs the server which algorithm was used to sign the token. This is used by the server when validating the signature since it needs to know which algorithm to use to regenerate the signature from the given token:
+  
+  ```
+  {
+    "alg": "HS256",
+    "typ": "JWT"
+   }
+  ```
+  
+  Since JWTs are stored on the client side we can also tamper with the values specified in the header component of the token. JWTs can use different signing algorithms such as HS256 but they can also be left unsigned. If this is the case, the value of the 'alg' name/value pair can be set to 'none' which indicates an insecure JWT. Typically servers will reject tokens with no signature but this is typically done through string validation, it is sometimes possible to bypass these validation checks by using character obfuscation techniques such as character encoding or random capitalization. 
+  
+  It is important to note that even if a JWT is unsigned it must still contain a trailing dot '.'
+  
+  
 </details>
