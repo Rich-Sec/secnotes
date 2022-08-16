@@ -29,7 +29,8 @@ When a server issues a JWT token a signature is typically generated from the hea
   Consider this example JWT token:
   
   ```
-  { "username": "john",
+  { 
+    "username": "john",
     "userType": "user"
   }
   ```
