@@ -48,6 +48,9 @@ When a server issues a JWT token a signature is typically generated from the hea
   {
     "alg": "HS256",
     "typ": "JWT"
+  
+    "alg": "none",
+    "typ": "JWT"
    }
   ```
   
