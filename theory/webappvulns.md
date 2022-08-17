@@ -58,5 +58,126 @@
   
   Since JWTs are stored on the client side we can also tamper with the values specified in the header component of the token. JWTs can use different signing algorithms such as HS256 but they can also be left unsigned. If this is the case, the value of the 'alg' name/value pair can be set to 'none' which indicates an insecure JWT. Typically servers will reject tokens with no signature but this is typically done through string validation, it is sometimes possible to bypass these validation checks by using character obfuscation techniques such as character encoding or random capitalization. 
   
-  It is important to note that even if a JWT is unsigned it must still contain a trailing dot '.' 
+  It is important to note that even if a JWT is unsigned it must still contain a trailing dot '.'
+  
+  ### JWT Header Parameter Injections:
+  The JWS specification states that only the 'alg' header parameter is required but in practice, JWT headers also known as JOSE headers can contain several other parameters. From an attackers perspective, we are interesting in the following parameters:
+  
+  * jwk (JSON Web Key) - Provides an embedded JSON object representing the key.
+  * jku (JSON Web Key Set URL) - Provides a URL from which servers can fetch a set of keys containing the correct key.
+  * kid (Key ID) - Provides an ID that servers can use to identify the correct key in cases where there are multiple keys to choose from. Depending on the format of the key, this may have a matching kid parameter.
+  
+  Each of these parameters are interesting to us since they tell the server which key to use when verifying the signature of a JWT, we can attempt to exploit these by injecting modified JWTs signed using our own arbitrary key rather than the servers. 
+  
+  #### Self Signing JWTs using the 'jwk' Parameter:
+  We can inject self signed JWTs via the "jwk" parameter, the jwk parameter can be used by servers to embed their own public key directly within the token itself in jwk format. "A JWK (JSON Web Key) is a standardized format for representing keys as a JSON object." Below is an example of jwk in a JWT:
+  
+  ```
+  {
+    "kid": "ed2Nf8sb-sD6ng0-scs5390g-fFD8sfxG",
+    "typ": "JWT",
+    "alg": "RS256",
+    "jwk": {
+        "kty": "RSA",
+        "e": "AQAB",
+        "kid": "ed2Nf8sb-sD6ng0-scs5390g-fFD8sfxG",
+        "n": "yy1wpYmffgXBxhAUJzHHocCuJolwDqql75ZWuCQ_cb33K2vh9m"
+    }
+  }
+  ```
+  In a perfect world, servers should only use a whitelist of public keys to verify the signatures in JWTs, misconfigured servers on the other hand sometimes use any key that is embedded in the jwk parameter. You can exploit this behavior by signing a modified JWT using your own RSA private key, then embedding the matching public key in the jwk header. 
+  
+  To perform this attack using BurpSuite we can follow the steps taken from the PortSwigger labs on JWTs:
+
+    * In Burp, load the JWT Editor extension from the BApp store.
+
+    * In the lab, log in to your own account and send the post-login GET /my-account request to Burp Repeater.
+
+    * In Burp Repeater, change the path to /admin and send the request. Observe that the admin panel is only accessible when logged in as the administrator user.
+
+    * Go to the JWT Editor Keys tab in Burp's main tab bar.
+
+    * Click New RSA Key.
+
+    * In the dialog, click Generate to automatically generate a new key pair, then click OK to save the key. Note that you don't need to select a key size as this will automatically be updated later.
+
+    * Go back to the GET /admin request in Burp Repeater and switch to the extension-generated JSON Web Token tab.
+
+    * In the payload, change the value of the sub claim to administrator.
+
+    * At the bottom of the JSON Web Token tab, click Attack, then select Embedded JWK. When prompted, select your newly generated RSA key and click OK.
+
+    * In the header of the JWT, observe that a jwk parameter has been added containing your public key.
+
+    * Send the request. Observe that you have successfully accessed the admin panel.
+
+  
+  #### Self Signing JWTs using the 'jku' Parameter:
+  Instead of embedding public keys directly using the 'jwk' parameter, some application servers will let you use the 'jku' header parameter to references a jwk set containing the public key. When verifiying the signature of a JWT, the server fetches the relevant key from the provided URL. A "JWK Set", is a JSON object containing an array of JWKs representing different keys:
+  
+  ```
+  {
+    "keys": [
+        {
+            "kty": "RSA",
+            "e": "AQAB",
+            "kid": "75d0ef47-af89-47a9-9061-7c02a610d5ab",
+            "n": "o-yy1wpYmffgXBxhAUJzHHocCuJolwDqql75ZWuCQ_cb33K2vh9mk6GPM9gNN4Y_qTVX67WhsN3JvaFYw-fhvsWQ"
+        },
+        {
+            "kty": "RSA",
+            "e": "AQAB",
+            "kid": "d8fDFo-fS9-faS14a9-ASf99sa-7c1Ad5abA",
+            "n": "fc3f-yy1wpYmffgXBxhAUJzHql79gNNQ_cb33HocCuJolwDqmk6GPM4Y_qTVX67WhsN3JvaFYw-dfg6DH-asAScw"
+        }
+    ]
+  }
+  
+```
+ JWK sets such as the one illustrated above, are sometimes accessible at application endpoints such as /.well-known/jwks.json, secure web applications will only fetch keys from trusted domains and sources but it could be possible to use URL parsing discrepancies to bypass filtering.
+  
+  * To perform this attack using BurpSuite we can follow the steps taken from the PortSwigger labs on JWTs:
+  
+  * In Burp, load the JWT Editor extension from the BApp store.
+
+  * In the lab, log in to your own account and send the post-login GET /my-account request to Burp Repeater.
+
+  * In Burp Repeater, change the path to /admin and send the request. Observe that the admin panel is only accessible when logged in as the administrator user.
+
+  * Go to the JWT Editor Keys tab in Burp's main tab bar.
+
+  * Click New RSA Key.
+
+  * In the dialog, click Generate to automatically generate a new key pair, then click OK to save the key. Note that you don't need to select a key size as this will automatically be updated later.
+
+  * In the browser, go to the exploit server.
+
+  * Replace the contents of the Body section with an empty JWK Set as follows:
+  
+  ```
+  {
+      "keys": [
+
+      ]
+  }
+  ```
+  * Back on the JWT Editor Keys tab, right-click on the entry for the key that you just generated, then select Copy Public Key as JWK. 
+  
+  * Paste the JWK into the keys array on the exploit server, then store the exploit.
+
+  * Go back to the GET /admin request in Burp Repeater and switch to the extension-generated JSON Web Token message editor tab.
+
+  * In the header of the JWT, replace the current value of the kid parameter with the kid of the JWK that you uploaded to the exploit server.
+  
+  * Add a new jku parameter to the header of the JWT. Set its value to the URL of your JWK Set on the exploit server.
+
+  * In the payload, change the value of the sub claim to administrator.
+
+  * At the bottom of the tab, click Sign, then select the RSA key that you generated in the previous section.
+
+  * Make sure that the Don't modify header option is selected, then click OK. The modified token is now signed with the correct signature.
+
+  * Send the request. Observe that you have successfully accessed the admin panel.
+
+  
 </details>
