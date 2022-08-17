@@ -89,27 +89,27 @@
   
   To perform this attack using BurpSuite we can follow the steps taken from the PortSwigger labs on JWTs:
 
-    * In Burp, load the JWT Editor extension from the BApp store.
+  * In Burp, load the JWT Editor extension from the BApp store.
 
-    * In the lab, log in to your own account and send the post-login GET /my-account request to Burp Repeater.
+  * In the lab, log in to your own account and send the post-login GET /my-account request to Burp Repeater.
 
-    * In Burp Repeater, change the path to /admin and send the request. Observe that the admin panel is only accessible when logged in as the administrator user.
+  * In Burp Repeater, change the path to /admin and send the request. Observe that the admin panel is only accessible when logged in as the administrator user.
 
-    * Go to the JWT Editor Keys tab in Burp's main tab bar.
+  * Go to the JWT Editor Keys tab in Burp's main tab bar.
 
-    * Click New RSA Key.
+  * Click New RSA Key.
 
-    * In the dialog, click Generate to automatically generate a new key pair, then click OK to save the key. Note that you don't need to select a key size as this will automatically be updated later.
+  * In the dialog, click Generate to automatically generate a new key pair, then click OK to save the key. Note that you don't need to select a key size as this will automatically be updated later.
 
-    * Go back to the GET /admin request in Burp Repeater and switch to the extension-generated JSON Web Token tab.
+  * Go back to the GET /admin request in Burp Repeater and switch to the extension-generated JSON Web Token tab.
 
-    * In the payload, change the value of the sub claim to administrator.
+  * In the payload, change the value of the sub claim to administrator.
 
-    * At the bottom of the JSON Web Token tab, click Attack, then select Embedded JWK. When prompted, select your newly generated RSA key and click OK.
+  * At the bottom of the JSON Web Token tab, click Attack, then select Embedded JWK. When prompted, select your newly generated RSA key and click OK.
 
-    * In the header of the JWT, observe that a jwk parameter has been added containing your public key.
+  * In the header of the JWT, observe that a jwk parameter has been added containing your public key.
 
-    * Send the request. Observe that you have successfully accessed the admin panel.
+  * Send the request. Observe that you have successfully accessed the admin panel.
 
   
   #### Self Signing JWTs using the 'jku' Parameter:
