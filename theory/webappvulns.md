@@ -136,7 +136,7 @@
 ```
  JWK sets such as the one illustrated above, are sometimes accessible at application endpoints such as /.well-known/jwks.json, secure web applications will only fetch keys from trusted domains and sources but it could be possible to use URL parsing discrepancies to bypass filtering.
   
-  * To perform this attack using BurpSuite we can follow the steps taken from the PortSwigger labs on JWTs:
+ To perform this attack using BurpSuite we can follow the steps taken from the PortSwigger labs on JWTs:
   
   * In Burp, load the JWT Editor extension from the BApp store.
 
@@ -178,6 +178,57 @@
   * Make sure that the Don't modify header option is selected, then click OK. The modified token is now signed with the correct signature.
 
   * Send the request. Observe that you have successfully accessed the admin panel.
+
+  #### Injecting Self-Signed JWTs via the KID (Key Identifier) Parameter:
+  
+  Application servers often use many different keys to sign different kinds of data, JWTs are typically just one type of application data that needs signing by the server. For this reason, the header of a JWT may contain a KID parameter, this helps the server identify which key to use when verifying the signature of a JWT. 
+  
+  Verification keys are usually stored as a JWK Set, in this case the server may simply look for the JWK with the same KID as the token. The JWS specification does not specify a concrete structure for this ID and instead this is left to the developer, it is simply an arbitrary string. A developer might set the KID parameter to point to an entry in a database or even a file name. If the "kid" parameter is also vulnerable to directory traversal, an attacker could force the server to use an arbitrary file from the servers filesystem as the verification key. 
+  
+  ```
+  {
+    "kid": "../../path/to/file",
+    "typ": "JWT",
+    "alg": "HS256",
+    "k": "asGsADas3421-dfh9DGN-AFDFDbasfd8-anfjkvc"
+  }
+  ```
+  This attack vector is particularly dangerous if the server also supports JWT signing using a symmetric encryption algorithm. In this case, an attacker could point the 'kid' parameter to a predicatable static file and sign the JWT using a secret that matches the contents of the file. One of the most simplest methods do this is to use the /dev/null file on Linux based systems, since the file is empty fetching it returns a null value and we can sign the token with a Base64-encoded null byte, this will result in a valid signature. 
+  
+  If the server stores its verification keys in a database, the kid header parameter is also a potential vector for SQL injection attacks. 
+  
+  To perform this attack using BurpSuite we can follow the steps from the PortSwigger labs on JWTs:
+ 
+  * In Burp, load the JWT Editor extension from the BApp store.
+
+  * In the lab, log in to your own account and send the post-login GET /my-account request to Burp Repeater.
+
+  * In Burp Repeater, change the path to /admin and send the request. Observe that the admin panel is only accessible when logged in as the administrator user.
+
+  * Go to the JWT Editor Keys tab in Burp's main tab bar.
+
+  * Click New Symmetric Key.
+
+  * In the dialog, click Generate to generate a new key in JWK format. Note that you don't need to select a key size as this will automatically be updated later.
+
+  * Replace the generated value for the k property with a Base64-encoded null byte (AA==).
+  
+  * Go back to the GET /admin request in Burp Repeater and switch to the extension-generated JSON Web Token message editor tab.
+
+  * In the header of the JWT, change the value of the kid parameter to a path traversal sequence pointing to the /dev/null file:
+  
+  ```
+    ../../../../../../../dev/null
+  
+  ```
+  * In the JWT payload, change the value of the sub claim to administrator.
+
+  * At the bottom of the tab, click Sign, then select the symmetric key that you generated in the previous section.
+
+  * Make sure that the Don't modify header option is selected, then click OK. The modified token is now signed using a null byte as the secret key.
+
+  * Send the request and observe that you have successfully accessed the admin panel.
+
 
   
 </details>
