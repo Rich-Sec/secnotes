@@ -3,7 +3,5 @@
 
 <details>
 <summary>Access Control Vulnerabilities</summary>
-<ul>
-  <li><a href="./accesscontrol/jwtattacks.md">JWT Attacks</a></li>
-</ul>
+<ul><li><a href="./accesscontrol/jwtattacks.md">JWT Attacks</a></li></ul>
 </details>
