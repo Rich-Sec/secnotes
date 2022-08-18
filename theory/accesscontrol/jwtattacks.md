@@ -490,12 +490,80 @@ To perform this attack using BurpSuite we can follow the steps from the PortSwig
 
 
 
+### Advanced JWT Algorithm Confusion Attacks:
+
+
 
 
 #### References for Content and Additional Attacks:
+Algorithm confusion attacks commonly known as "key confusion attacks", occur when an attacker is able to force the server into verifying the signature of a JWT using a different algorithm that is intended by the web application. If this case is not handled correctly, attackers could forge valid JWTs containing arbitrary values without requiring the secret signing key. 
 
+JWTs can be signed using a plethora of different algorithms, some such as HS256 use a symmetric key, meaning that the server uses a single key to sign and verify the token. This key needs to be kept secret much like a password would be. Other algorithms such as RS256 (RSA + SHA-256) utilise "asymmetric" cryptography, a private key is used to sign the token and the public key is used to verify the signature. The private much like the symmetric key must be kept secret!
 
+Algorithm confusion vulnerabilities arise due to flawed implementation of JWT libraries. Actual verification differs on the algorithm used, many libraries provide a single, alogrithm-agnostic method for verifying signatures. These methods rely on the "alg" header parameter to determine the type of verification to perform, e.g:
+
+```
+function verify(token, secretOrPublicKey){
+    algorithm = token.getAlgHeader();
+    if(algorithm == "RS256"){
+        // Use the provided key as an RSA public key
+    } else if (algorithm == "HS256"){
+        // Use the provided key as an HMAC secret key
+    }
+}
+```
+
+Issues arise when developers who uses these methods assume that it will exclusively handle JWTs signed using an asymmetric algorithm like RS256. Due to this assumption they may always pass a fixed public key to the method:
+
+```
+publicKey = <public-key-of-server>;
+token = request.getCookie("session");
+verify(token, publicKey);
+```
+
+In this scenario, the server recieves a token signed by a symmetric algorithm like HS256, the libraries verify() method will treat the public key as an HMAC secret. An attacker could sign the token using HS256 and the public key, and the server will use the same public key to verify the signature. The public key you use to sign the token must be absolutely identical to the public key stored on the server. This includes using the same format (such as X.509 PEM) and preserving any non-printing characters like newlines. In practice, you may need to experiment with different formatting in order for this attack to work.
+
+An algorithm confusion attack typically follows these abstracted steps:
+
+1. Obtain the servers public key
+2. Convert the public key to a suitable format
+3. Create a malicious JWT with a modified payload and the alg header set to HS256 
+4. Sign the token with HS256 using the public key as secret. 
+
+Perhaps the most complex part of this attack is step 2. Public keys are typically stored in JWT format but when the server verifies the signature of a token it will use its own copy of the key on the local filesystem or database. In order for the attack to work the version of the key used to sign the JWT must be identical to the servers local copy, it must be the same format and every byte must match including non-printing characters. To convert a key into X.509 PEM format using BurpSuite we can:
+
+* With the JWT Editor Extension, in Burp's main tab bar, go to the JWT Editor Keys tab.
+
+* Click New RSA Key. In the dialog, paste the JWK that you obtained earlier.
+
+* Select the PEM radio button and copy the resulting PEM key.
+
+* Go to the Decoder tab and Base64-encode the PEM.
+
+* Go back to the JWT Editor Keys tab and click New Symmetric Key.
+
+* In the dialog, click Generate to generate a new key in JWK format.
+
+* Replace the generated value for the k parameter with a Base64-encoded PEM key that you just copied. 
+
+* Save the key.
+
+Once we have converted the key into suitable format, we can modify our JWT however we like, we must make sure however that the alg header parameter is set to HS256. We can then use BurpSuite again to sign the token using the HS256 algorithm and the RSA public key as a secret, we can do this using the attack function of the JSON Web Tokens extension and selecting "HMAC Key Confusion". 
+
+Please see: https://portswigger.net/web-security/jwt/algorithm-confusion for more details :)
+
+We can also attempt to derive public keys from existing tokens if we are unable to uncover them on the server. This process uses toolkits such as jwt_forgery.py and other tools from https://github.com/silentsignal/rsa_sign2n. 
+
+ This uses the JWTs that you provide to calculate one or more potential values of n. Don't worry too much about what this means - all you need to know is that only one of these matches the value of n used by the server's key. For each potential value, our script outputs:
+
+ * A Base64-encoded PEM key in both X.509 and PKCS1 format.
+
+ * A forged JWT signed using each of these keys.
+
+To identify the correct key, use Burp Repeater to send a request containing each of the forged JWTs. Only one of these will be accepted by the server. You can then use the matching key to construct an algorithm confusion attack. 
+
+### References:
 
 * https://portswigger.net/web-security/jwt
-
+* https://portswigger.net/web-security/jwt/algorithm-confusion
 * https://book.hacktricks.xyz/pentesting-web/hacking-jwt-json-web-tokens
