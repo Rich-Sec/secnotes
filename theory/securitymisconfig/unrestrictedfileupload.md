@@ -45,3 +45,88 @@ This kind of configuration differs between directories, directories which contai
 
 
 You should also note that even though you may send all of your requests to the same domain name, this often points to a reverse proxy server of some kind, such as a load balancer. Your requests will often be handled by additional servers behind the scenes, which may also be configured differently.
+
+### Weak Blacklist of Dangerous file Types:
+One of the more common ways of preventing malicious file uploads is by using a blacklist to block potentially malicious extensions such as .php and .jsp. Blacklisting is very hard to get right and often implemented incorrectly since blocking every file type that could potentially execute code is time consuming and prone to errors. As such, blacklists can often be bypassed using lesser known file types and alternative file extensions, e.g .php5, .shtml, etc
+
+As mentioned, servers typically dont execute files unless they have been configured to do so, e.g before an Apache server can execute PHP files requested by a client, developers might have to add the following directives to their apache configuration file (/etc/apache2/apache2.conf):
+
+```
+LoadModule php_module /usr/lib/apache2/modules/libphp.so
+AddType application/x-httpd-php .php
+```
+
+Servers also allow developers to creates special config files within individual directories in order to override or add to one or more of the global settings. Apache servers for example will load directory-specific configurations from the .htaccess file if one is present. In IIS web servers, the web.config file can be used to achieve the same result, e.g:
+
+```
+<staticContent>
+    <mimeMap fileExtension=".json" mimeType="application/json" />
+</staticContent>
+```
+Web servers use these configuration files when present but they are usually not allowed to be access using HTTP requests. It might also be possible to upload your own malicious configuration file and in this case even if the file extension is blacklisted, you might be able to force the server into mapping arbitrary, custom file extensions to an executable MIME type.
+
+By uploading our own .htaccess file we can attempt to force the server to execute our malicious scripts using arbitrary extensions:
+
+```
+AddType application/x-httpd-php .pwn
+```
+
+```
+-----------------------------343802486225708921932812508841
+
+Content-Disposition: form-data; name="avatar"; filename="profilepic.pwn"
+Content-Type: application/x-php5
+<?php echo file_get_contents('/home/user/.ssh/id_rsa'); ?
+
+GET /files/avatars/profilepic.pwn HTTP/1.1
+```
+
+### Obfuscating File Extensions:
+Even extensive blacklists can still be potentially bypassed by using simple obfuscation techniques, a common example is a blacklist that prevents .php files from being uploaded but allows .pHp files through. If the application code that maps the file extension to a MIME type is NOT case sensitive this discrepancy allows you to sneak malicious PHP files past validation that may eventually be executed by the server.
+
+Other ways to bypass file extension validation using obfuscations include:
+
+* Providing multiple extensions: .php.jpg, .php.png
+* Adding trailing characters: exploit.php. 
+* Using URL encoding or double URL encoding for dots, forward slashes, backwards slashes, etc. If the value isn't decoded when validating the file extension but is later decoded server side, this can allow you to upload malicious files. E.g exploit%2Ephp
+* Adding semi-colons or URL-encoded null byte characteres before the file extension. If validation is written in  high level language such as PHP or Java but the server processes the file using low level C/C++ based languages, this can cause discrepancies in what is treated at the end of the filena,e: exploit.jsp;.jpg or exploit.asp%00.jpg
+* Using multibyte unicode characters, which may be converted to null bytes and does after unicode conversion or normalisation. Sequences such as xc0, x2E, xC4, xAE or xC0 xAE may be translated to x2E if the filename is parsed as a UTF-8 string but then converted to ASCII characters before being used in the path. 
+
+Other defences involve stripping or replacing dangerous extensions to prevent the file from being executed. If this transformation isn't applied recursively you can position the prohibited string in such a way that removing it still leaves behind a valid file extension. E.g consider what happens when you strip '.php' from the following filename:
+
+```
+exploit.p.phphp
+```
+
+### Broken Validation of File Contents:
+More secure web servers will perform validation on not just the file descriptors such as the MIME type, but also ensure that the contents of the file matches the Content-Type header specified. In the case of an image upload function, the server might try to verify intrinsic properties of an image such as its dimensions. A PHP script will not contain any dimensions at all and the server will deduce that the file is not an image. Files can also contain what are known as "magic bytes", these are found in the header and footer of the file and act as a fingerprint or signature to determine whether the contents matches the expected type. A JPEG file for example, always begins with the bytes FF D8 FF.
+
+This is a more robust way of validating file types but it is not fool proof. Using special tools such as ExifToll we can create a polyglot JPEG file that contains malicious code within its metadata.
+
+```
+exiftool -Comment="<?php echo 'START ' . file_get_contents('/etc/passwd') . ' END'; ?>" <YOUR-INPUT-IMAGE>.jpg -o polyglot.php
+```
+
+### File Upload Race Conditions:
+Modern application frameworks are resistant to the types of attacks described above, files are generally not uploaded to their intended destination on the filesystem. Files are usually uploaded to a temporary sandboxed directory first and the filename is randomized to avoid overwriting existing files. After this, file validation is performed on the temporary file and only then is it transfered to its destination. 
+
+Developers have the option to implement their own file upload functionality independent of any framework, this is a complex process and as a result race conditions can be introduced that bypass the security restrictions. Some websites upload the file directly to the main filesystem and remove it again if it doesn't pass the validation, this behaviour is typical of ant-virus software checking for malware. The process may only take a few milliseconds but for a short time the file exists on the server, this means an attacker can potentially execute their script. 
+
+These vulnerabilities are very subtle and finding them in a black-box test is very difficult unless source code is leaked.
+
+Race conditions can also occur in functions that allow you to perform file uploads via a URL. The server has to fetch the file over the internet and create a local copy before it can perform any validation. As the file is being loaded over HTTP, developers are unable to use their frameworks built-in mechanisms for validation files and instead use their own processes for string and validating the file. For example, the file could be loaded into a temporary directory with a random name, in theory it should be impossible to exploit any race condition if they don't know the directory name but if pseudo-random functions are used such as PHP uniqid(), it could be possible to bruteforce the directory name. To make the attack easier, you can pad out the file using arbitrary bytes and have the payload positioned at the start, this means the file will take longer to process and reside on the server for longer.
+
+### Other Ways to Achieve RCE with File Uploads:
+Using JavaScript, we might be able to create stored XSS payloads on the web application. Due to same-origin policy restrictions these scripts will need to be served from the same origin that you uploaded it to, common attack vectors include usernames, profile names, comments, etc.
+
+Another method of attacking an application using file uploads is exploiting parsers used by the application. If the uploaded file seems to be both stored and served it might be possible to obtain RCE via parsers such as XML-parsers. XXE injection attacks often arise due to flaws in how the application parses XML content. 
+
+Another method to try is the HTTP method PUT. This HTTP method is rarely used due to its insecure nature but if it is present on a web application it might be worth attempting to upload a file using the PUT method. You can try sending OPTIONS requests to different endpoints to test for any that advertise support for the PUT method. 
+
+### How to Prevent File Uploads:
+* Check file extensions against a whitelist rather than a blacklist.
+* Make sure the filename does not contain any substrings that could be interpreted as a directory or a traversal sequence(../) 
+* Rename uploaded files to avoid collisions that may cause existing files to be overwritten
+* Do not upload files to the servers permanent file system until the file has been completely validated. 
+* Establish a framework for preprocessing file uploads rather than attempting to write custom validation code. 
+
